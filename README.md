@@ -3,8 +3,7 @@ Open-source hardware-based boat racing GPS plotter
 
 ## Background
 
-There are some excellent race gadgets available - at a price, and with limited availability. E.g. [speedpuck](https://www.velocitek.com/pages/speedpuck), [prostart]
-(https://www.velocitek.com/pages/prostart), [sailracer](https://www.sailracer.net/inkdisplay/).
+There are some excellent race gadgets available - at a price, and with limited availability. E.g. [speedpuck](https://www.velocitek.com/pages/speedpuck), [prostart](https://www.velocitek.com/pages/prostart), [sailracer](https://www.sailracer.net/inkdisplay/).
 
 It's attractive to consider an open-source device, to allow playing about with different ways of representing data during training, e.g. heading variation plotted with time, or chart plotter showing race track (with race committee, pin end buttons, and a potentiometer for distance to top mark, and another for bearing to top mark, as these are often read out over the radio prior to the start).
 
@@ -21,6 +20,7 @@ It's attractive to consider an open-source device, to allow playing about with d
 It's [reported](https://www.u-blox.com/en/press-releases/u-blox-and-velocitek-chosen-several-world%E2%80%99s-top-sailing-teams) that the velocitek SC1 uses ublox GPS, and [speculated](https://portal.u-blox.com/s/question/0D52p00008HKDqaCAH/stolen-device-velocitek-speedpuck-possible-to-locatetrack-the-ublox-antaris-lea4a-chip) that the speedpuck uses the LEA-4A, or [alternatively](https://www.gps-speedsurfing.com/default.aspx?mnu=forum&forum=6&val=100929) LEA-5M.
 
 [GPS with RTC](https://thepihut.com/products/raspberry-pi-gps-hat) £45
+
 [External antenna](https://thepihut.com/products/gps-antenna-external-active-antenna-3-5v-28db-5-meter-sma) £16
 
 ### Display
@@ -41,6 +41,7 @@ Custom LCD displays are used to get the large numbers and custom heading shift g
 [10Ah 3,7V](https://amazon.co.uk/Seamuing-Rechargeable-Integrated-Protective-Insulation/dp/B0953L98RK) for £21
 
 ### Costing
+```
  45 GPS
  16 Antenna
 210 Display
@@ -51,6 +52,7 @@ Custom LCD displays are used to get the large numbers and custom heading shift g
  21 Battery
 -----------
 404 Total
+```
 
 Plus development work.
 
