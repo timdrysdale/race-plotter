@@ -84,6 +84,11 @@ So .... options to consider!
 
 
 
+## Fonts
+
+An updated version of Derek Higg's hand-traced mil spec aviation instrumentation [font](https://www.simpits.org/fileproc/dload.php?file=MS33558FONT.ZIP) is available here:
+https://forums.eagle.ru/topic/266630-ms33558-font/
 
 
+This font was prepared for the e-ink display in the size 210 high by 160 px wide using [font2bytes](https://github.com/ayoy/font2bytes) GUI version on linux/amd64 (remember to initialise and update submodules to get the gsl library files needed for the build).
 
