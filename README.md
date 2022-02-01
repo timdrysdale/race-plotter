@@ -1,11 +1,35 @@
 # race-plotter
-Open-source hardware-based boat racing GPS plotter
+Open-source hardware-based boat racing GPS plotter.
+
+![status](https://img.shields.io/badge/STATUS-INCOMPLETE-red)
+
+<figure>
+
+![demo](./img/display-demo.gif)
+
+<figcaption align = "left"><b>Fig. 1 - Mock-up of compass and shift indicator as if lifting on starboard tack</b></figcaption>
+
+</figure>
+
 
 ## Background
 
-There are some excellent race gadgets available - at a price, and with limited availability. E.g. [speedpuck](https://www.velocitek.com/pages/speedpuck), [prostart](https://www.velocitek.com/pages/prostart), [sailracer](https://www.sailracer.net/inkdisplay/).
+Yacht racers benefit from knowing their speed and heading, and how it is changing with time. With increasing access to global navigation systems, electronic navigation aids have become available and are class legal to a greater or lesser degree.
 
-It's attractive to consider an open-source device, to allow playing about with different ways of representing data during training, e.g. heading variation plotted with time, or chart plotter showing race track (with race committee, pin end buttons, and a potentiometer for distance to top mark, and another for bearing to top mark, as these are often read out over the radio prior to the start).
+The UK/RYA [class rules](https://assets.rya.org.uk/assetbank-rya-assets/action/directLinkImage?assetId=53776) for a closed class such as the Hunter 707 do not permit anything not specifically mentioned. However they do permit:
+
+0. Electrical power only socket fitting for portable GPS unit.
+0. Stand alone or portable GPS (not interfaced) which may be electrically fed from
+the yacht’s battery
+0. Self-contained electronic timing devices, and either an electronic digital
+compass or an additional magnetic (non-electronic) compass
+
+This rules out masthead wind strength and direction instruments, and cruiser-style GPS systems with wiring to separate chart plotters etc.  However, portable GPS typically contain a chartplotter and all manner of derived properties can be displayed. Since large-screen portable GPS units are fairly expensive, and fiddly to use, it's tempting to consider a more specialised instrument for yacht racing.
+
+
+There are some excellent specialised electronic navigation aids available for racing. They can seem expensive compared to consumer gadgets, presumably due to the smaller production volumes, and ruggedisation to handle difficult conditions. Some gadgets I am aware of include the [speedpuck](https://www.velocitek.com/pages/speedpuck), [prostart](https://www.velocitek.com/pages/prostart), [sailracer](https://www.sailracer.net/inkdisplay/).
+
+Given there are some stock availability issues with the speedpuck and sailracer display just now, it's attractive to consider developing an open-source hardware system. This has the benefit of allowing the freedom to play about with different ways of representing data during training, e.g. heading variation plotted with time, or chart plotter showing race track (with race committee, pin end buttons, and a potentiometer for distance to top mark, and another for bearing to top mark, as these are often read out over the radio prior to the start). Initially, a button-free device is intended because that is easier to waterproof, and one fewer thing to have a setting that can be wrong.
 
 ## Constraints
 
@@ -13,7 +37,43 @@ It's attractive to consider an open-source device, to allow playing about with d
 - Water
 - Shocks
 
-## Parts
+A flexible e-ink screen with fast refresh should handle daylight visibility and shocks. It remains to be seen how well an e-ink display refreshes in bright sunlight. Perhaps a UV filtering cover will be required.
+
+Waterproofing will be most straightforward if an existing IP68 enclosure is purchased, perhaps with some 3D printed mounts for the internal components.
+
+## Development hardware
+
+The following items have been purchased for the development work
+
+0. Raspberry Pi Pico £3.60
+0. Waveshare 3.7" e-Paper e-Ink Display for Raspberry Pi Pico (480x280) £24.00
+0. GNSS Module for Raspberry Pi Pico (L76B) £25.00
+0. ML1220 rechargeable battery £3
+0. Waveshare UPS Module for Raspberry Pi Pico £19.00
+0. 10,000mAh 3.7V Lithium battery £20.99
+
+The total cost so far is £95.59 (nearly a third of the way to the cost of a speedpuck, with no code, no testing, and no case!)
+
+<img src="./img/pico.jpg" alt="Pico" width="200"/>
+<img src="./img/e-ink.jpg" alt="E-ink" width="200"/>
+<img src="./img/gnss.jpg" alt="GNSS" width="200"/>
+<img src="./img/ups.jpg" alt="UPS" width="200"/>
+<img src="./img/battery.jpg" alt="Battery" width="200"/>
+
+
+
+## Development notes
+
+### Fonts
+
+An updated version of Derek Higg's hand-traced mil spec aviation instrumentation [font](https://www.simpits.org/fileproc/dload.php?file=MS33558FONT.ZIP) is available here:
+https://forums.eagle.ru/topic/266630-ms33558-font/
+
+
+The digits in this font were prepared for the e-ink display in the size 189 high by 144 px wide using [font2bytes](https://github.com/ayoy/font2bytes) GUI version on linux/amd64 (remember to initialise and update submodules to get the gsl library files needed for the build).
+
+
+## Parts - Original options considered
 
 ### GPS data on speed and heading
 
@@ -77,18 +137,7 @@ https://tactiqs.io/ is for iOs.
 So .... options to consider!
 
 
- 
 
 
 
-
-
-
-## Fonts
-
-An updated version of Derek Higg's hand-traced mil spec aviation instrumentation [font](https://www.simpits.org/fileproc/dload.php?file=MS33558FONT.ZIP) is available here:
-https://forums.eagle.ru/topic/266630-ms33558-font/
-
-
-This font was prepared for the e-ink display in the size 210 high by 160 px wide using [font2bytes](https://github.com/ayoy/font2bytes) GUI version on linux/amd64 (remember to initialise and update submodules to get the gsl library files needed for the build).
 
