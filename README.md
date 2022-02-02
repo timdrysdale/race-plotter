@@ -11,6 +11,21 @@ Open-source hardware-based boat racing GPS plotter.
 
 </figure>
 
+## Usage
+
+The main branch code simply mocks a compass display with shift indicator. 
+
+Install the Raspberry Pi Pico toolchain on a Raspberry Pi 4 running the 32-bit Lite OS (no desktop).
+
+Wire the debug port to the Raspberry Pi to permit hands-free loading of code (see Chapter 5 [Getting Started Guide](./doc/getting-started-with-pico.pdf)). 
+
+```
+git clone git@github.com@timdrysdale/race-plotter
+cd race-plotter/c
+./run.sh
+```
+
+After about a minute of compilation, you should see the heading indicator mockup from Fig. 1 running on your display.
 
 ## Background
 
