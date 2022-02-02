@@ -72,6 +72,25 @@ https://forums.eagle.ru/topic/266630-ms33558-font/
 
 The digits in this font were prepared for the e-ink display in the size 189 high by 144 px wide using [font2bytes](https://github.com/ayoy/font2bytes) GUI version on linux/amd64 (remember to initialise and update submodules to get the gsl library files needed for the build).
 
+### GNSS
+
+There is no C code available from the waveshare wiki for this board. It uses a serial protocol, so the python code will be sufficient information on how to operate with the GNSS board.
+
+The micropython [UART](https://docs.micropython.org/en/latest/library/machine.UART.html) is configured as 
+
+``` 
+def Uart_Set_Baudrate(self, Baudrate):
+    self.ser = UART(0,baudrate=Baudrate,tx=Pin(0),rx=Pin(1))%
+```
+where 
+```
+class machine.UART(id, ...)
+
+UART.init(baudrate=9600, bits=8, parity=None, stop=1, *, ...)
+```
+
+Therefore the 0 is just the UART identification. The serial link is configured as the default 9600baud 8 bits, no parity, 1 stop bit.
+
 
 ## Parts - Original options considered
 

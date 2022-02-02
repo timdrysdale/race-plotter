@@ -4,7 +4,7 @@ if (TARGET tinyusb_device)
             )
 
     # pull in common dependencies
-    target_link_libraries(hello_usb pico_stdlib)
+    target_link_libraries(hello_usb pico_stdlib hardware_uart)
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(hello_usb 1)
@@ -17,4 +17,7 @@ if (TARGET tinyusb_device)
     example_auto_set_url(hello_usb)
 elseif(PICO_ON_DEVICE)
     message(WARNING "not building hello_usb because TinyUSB submodule is not initialized in the SDK")
-endif()
+  endif()
+
+
+
