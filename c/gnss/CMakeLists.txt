@@ -18,6 +18,9 @@ pico_sdk_init()
 
 include(example_auto_set_url.cmake)
 
+include_directories(lwgps/src/include)
+add_subdirectory(lwgps/src/lwgps)
+
 # Add hello world example
 add_subdirectory(hello_world)
 
@@ -26,5 +29,6 @@ add_compile_options(-Wall
         -Wno-unused-function # we have some for the docs that aren't called
         -Wno-maybe-uninitialized
         )
+
 
 

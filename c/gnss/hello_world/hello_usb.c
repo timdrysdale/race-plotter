@@ -8,7 +8,9 @@
 #include "pico/stdlib.h"
 #include "hardware/uart.h"
 #include "hardware/irq.h"
-
+#include "lwgps/lwgps.h"
+#include "lwrb/lwrb.h"
+#include <string.h>
 
 /// \tag::uart_advanced[]
 
@@ -24,12 +26,24 @@
 
 static int chars_rxed = 0;
 
+// For LwGPS
+
+/* GPS handle */
+lwgps_t hgps;
+
+/* GPS buffer */
+lwrb_t hgps_buff;
+uint8_t hgps_buff_data[12];
+
 // RX interrupt handler
 void on_uart_rx() {
     while (uart_is_readable(UART_ID)) {
         uint8_t ch = uart_getc(UART_ID);
-		printf("%c",ch);
+		//printf("%c",ch);
         chars_rxed++;
+        /* Make interrupt handler as fast as possible */
+        /* Only write to received buffer and process later */
+        lwrb_write(&hgps_buff, &ch, 1);
     }
 }
 
@@ -78,8 +92,33 @@ int main() {
     // The handler will count them, but also reflect the incoming data back with a slight change!
     //uart_puts(UART_ID, "\nHello, uart interrupts\n");
 
-    while (1)
-	  tight_loop_contents(); //no-op
+	// lwGPS setup
+	uint8_t rx;
+
+    /* Init GPS */
+    lwgps_init(&hgps);
+
+    /* Create buffer for received data */
+    lwrb_init(&hgps_buff, hgps_buff_data, sizeof(hgps_buff_data));
+	
+
+	while (1) {
+
+        /* Process all input data */
+        /* Read from buffer byte-by-byte and call processing function */
+        if (lwrb_get_full(&hgps_buff)) {        /* Check if anything in buffer now */
+            while (lwrb_read(&hgps_buff, &rx, 1) == 1) {
+                lwgps_process(&hgps, &rx, 1);   /* Process byte-by-byte */
+            }
+        } else {
+            /* Print all data after successful processing */
+            printf("Latitude: %f degrees\r\n", hgps.latitude);
+            printf("Longitude: %f degrees\r\n", hgps.longitude);
+            printf("Altitude: %f meters\r\n", hgps.altitude);
+        }
+		
+	}
+	 
 }
 
 /// \end:uart_advanced[]
