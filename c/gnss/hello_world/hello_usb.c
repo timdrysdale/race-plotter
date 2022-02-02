@@ -4,27 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdio.h>
-#include "pico/stdlib.h"
-
-int main() {
-    stdio_init_all();
-    while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
-    }
-    return 0;
-}
-
-
-
-
-/**
- * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
- *
- * SPDX-License-Identifier: BSD-3-Clause
- */
-
 
 #include "pico/stdlib.h"
 #include "hardware/uart.h"
@@ -49,7 +28,7 @@ static int chars_rxed = 0;
 void on_uart_rx() {
     while (uart_is_readable(UART_ID)) {
         uint8_t ch = uart_getc(UART_ID);
-		printf("%c",ch)
+		printf("%c",ch);
         chars_rxed++;
     }
 }
