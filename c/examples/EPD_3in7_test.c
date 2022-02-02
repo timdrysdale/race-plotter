@@ -53,44 +53,58 @@ int EPD_3in7_test(void)
 
     const char *a[5];
     a[0] = "\")$";
-    a[1] = "\")&";
+    a[1] = "\")'";
     a[2] = "\")(";
     a[3] = "# !";
     a[4] = "# #";
+    
+    int idx[15] = {0,1,2,3,4,3,2,2,1,2,0,1,3,4,3};
 
-    int i;
+    int i, j;
 
     EPD_3IN7_1Gray_Init();       //init 1 Gray mode
     EPD_3IN7_1Gray_Clear();
 
+  
+    for (j = 0; j <15; j++) { 
 
-    for (i = 0; i <5; i++) { 
+    i = idx[j];
 
     Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
     Paint_SetScale(2);
     Paint_Clear(WHITE);
-    //Paint_DrawRectangle(1, 1, 450, 200, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    //Paint_DrawRectangle(3,3,448,198, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
     Paint_DrawString_EN(5,75, a[i], &Font189, WHITE, BLACK);
     printf("Part refresh...\r\n");
-    Paint_DrawRectangle(1, 1, 450, 40, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    Paint_DrawRectangle(3, 3, 448, 38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+    //Paint_DrawRectangle(1, 1, 480, 40, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+    //Paint_DrawRectangle(3, 3, 478, 38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+
+
+    Paint_DrawCircle(450, 95, 15, BLACK, DOT_PIXEL_4X4, DRAW_FILL_EMPTY);
+
+    Paint_DrawRectangle(238,3,242,68, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
     if ( i > 0) {
-    Paint_DrawRectangle(240,3,260,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+      Paint_DrawRectangle(247,3,267,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+      Paint_DrawLine(440,21,468,21, BLACK, DOT_PIXEL_8X8, LINE_STYLE_SOLID);
+      Paint_DrawLine(460,7,460,38, BLACK, DOT_PIXEL_4X4, LINE_STYLE_SOLID);
+      Paint_DrawLine(460,7,476,21, BLACK, DOT_PIXEL_4X4, LINE_STYLE_SOLID);
+      Paint_DrawLine(476,21,460,38, BLACK, DOT_PIXEL_4X4, LINE_STYLE_SOLID);
+      
+ 
         }
     if  (i > 1) {
-       Paint_DrawRectangle(265,3,285,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+       Paint_DrawRectangle(272,3,292,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     } 
     if  (i > 2) {
-       Paint_DrawRectangle(290,3,310,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+       Paint_DrawRectangle(297,3,317,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     } 
     if  (i > 3) {
-       Paint_DrawRectangle(315,3,335,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+       Paint_DrawRectangle(322,3,342,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     } 
    if  (i > 4) {
-       Paint_DrawRectangle(340,3,365,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+       Paint_DrawRectangle(347,3,372,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     } 
 
     EPD_3IN7_1Gray_Display(BlackImage);
