@@ -60,7 +60,7 @@ int EPD_3in7_test(void)
     
     int idx[15] = {0,1,2,3,4,3,2,2,1,2,0,1,3,4,3};
 
-    int i, j;
+    int i, j, lasti;
 
     EPD_3IN7_1Gray_Init();       //init 1 Gray mode
     EPD_3IN7_1Gray_Clear();
@@ -86,14 +86,15 @@ int EPD_3in7_test(void)
 
     if ( i > 0) {
       Paint_DrawRectangle(247,3,267,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+}
 
+    if ( i > 0 && i > lasti ) {
       Paint_DrawLine(440,21,468,21, BLACK, DOT_PIXEL_8X8, LINE_STYLE_SOLID);
       Paint_DrawLine(460,7,460,38, BLACK, DOT_PIXEL_4X4, LINE_STYLE_SOLID);
       Paint_DrawLine(460,7,476,21, BLACK, DOT_PIXEL_4X4, LINE_STYLE_SOLID);
       Paint_DrawLine(476,21,460,38, BLACK, DOT_PIXEL_4X4, LINE_STYLE_SOLID);
-      
- 
-        }
+    }
+
     if  (i > 1) {
        Paint_DrawRectangle(272,3,292,38, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     } 
@@ -109,6 +110,7 @@ int EPD_3in7_test(void)
 
     EPD_3IN7_1Gray_Display(BlackImage);
     DEV_Delay_ms(1000);
+    lasti = i;
 
 }
 
