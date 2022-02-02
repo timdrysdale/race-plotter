@@ -91,6 +91,301 @@ UART.init(baudrate=9600, bits=8, parity=None, stop=1, *, ...)
 
 Therefore the 0 is just the UART identification. The serial link is configured as the default 9600baud 8 bits, no parity, 1 stop bit.
 
+A char-by-char forward to printf yields the output from the GNSS chip on the rpi terminal display.
+
+The GNSS board produces default output in the following (repeating) form:
+
+```
+<snip>
+$GPGSV,4,1,13,27,82,129,29,08,59,283,18,10,48,118,41,23,42,068,42*7B
+$GPGSV,4,2,13,16,38,176,24,21,28,238,21,07,20,290,21,36,19,140,38*7A
+$GPGSV,4,3,13,30,17,317,17,18,14,062,34,15,11,031,20,13,07,003,*77
+$GPGSV,4,4,13,26,06,165,*4B
+$BDGSV,3,1,10,24,34,278,14,20,32,066,46,29,30,091,46,19,27,124,44*6B
+$BDGSV,3,2,10,26,23,225,23,12,15,269,,13,13,047,36,25,12,333,34*65
+$BDGSV,3,3,10,05,08,113,39,08,02,042,*61
+$GNGLL,xxxx.xxxx,N,xxxxx.xxxx,W,210155.000,A,D*50
+$GNRMC,210156.000,A,5555.9592,N,00310.4012,W,0.00,317.31,020222,,,D*63
+$GNVTG,317.31,T,,M,0.00,N,0.00,K,D*21
+$GNGGA,210156.000,5555.9592,N,00310.4012,W,2,15,0.69,50.7,M,49.6,M,,*52
+$GPGSA,A,3,16,08,23,27,18,21,30,10,15,,,,1.03,0.69,0.76*09
+$BDGSA,A,3,13,05,29,25,20,19,,,,,,,1.03,0.69,0.76*1E
+<snip>
+```
+
+These messages can be interpreted as follows:
+
+#### GPGSV GPS satellites in view
+
+Information from [here](https://docs.novatel.com/OEM7/Content/Logs/GPGSV.htm)
+
+
+```
+$GPGSV,4,1,13,27,82,129,29,08,59,283,18,10,48,118,41,23,42,068,42*7B
+$GPGSV,4,2,13,16,38,176,24,21,28,238,21,07,20,290,21,36,19,140,38*7A
+$GPGSV,4,3,13,30,17,317,17,18,14,062,34,15,11,031,20,13,07,003,*77
+$GPGSV,4,4,13,26,06,165,*4B
+```
+
+Field | Structure | Description
+---|---|---
+1  | $GPGSV | header 
+2  | #msgs | total number of messages
+3  | msg # | message number
+4  | # sats | number of satellites
+5  | prn   | satellite PRN number (GPS=1-32, Gallileo=1-36, BeiDou=1-63, etc)
+6 | elev | elevation degrees, 90 max
+7 | azimuth | degrees true, 000-359
+8 | SNR | Signal to noise ratio
+| | (repeat 5-8 for more satellites)
+n | *xx | checksum
+
+In this example there are 13 GPS satellites in view.
+
+
+#### BDGSV Beidou Satellites in view
+
+At first glance, this has a similar structure to GPGSV.
+
+```
+$BDGSV,3,1,10,24,34,278,14,20,32,066,46,29,30,091,46,19,27,124,44*6B
+$BDGSV,3,2,10,26,23,225,23,12,15,269,,13,13,047,36,25,12,333,34*65
+$BDGSV,3,3,10,05,08,113,39,08,02,042,*61
+```
+
+In this example, there are 10 Beidou satellites in view.
+
+#### GNGLL Geopgraphic position and latitude
+
+[description](https://docs.novatel.com/OEM7/Content/Logs/GPGLL.htm)
+
+
+```
+$GNGLL,xxxx.xxxx,N,xxxxx.xxxx,W,210155.000,A,D*50
+```
+
+Field | Structure | Description
+---|---|---
+1 | $GPGLL | header
+2 | Latitude | DDmm.mm where DD deg, mm.mm min
+3 | lat dir| N(orth) or S(outh)
+4 | longitude | DDDmm.mm where DD deg, mm.mm min (may have more decimal places than just two)
+5 | lon dir | (E)east or (W)est
+6 | utc | fix taken at hh:mm:ss UTC 
+7 | valid | A valid data (V invalid)
+8 | mode ind | Positioning system mode indicator 
+9 | *xx | checksum
+
+Mode | Indicator
+---|---
+A | autonomous
+D | differential
+E | estimated (dead reckoning)
+M | manual input
+N | data not valid
+
+I've redacted the coordinates, but putting them into Google gives an error of about 3m, assuming I've estimated the antenna position correctly.
+
+![error](./img/gps-error.png)
+
+
+#### GNRMC  GPS specific information (for multi GNSS solution)
+
+[description](https://docs.novatel.com/OEM7/Content/Logs/GPRMC.htm)
+
+
+```
+$GNRMC,210156.000,A,xxxx.xxxx,N,xxxxx.xxxx,W,0.00,317.31,020222,,,D*63
+```
+
+Field | Structure | Description
+---|---|---
+1 | $GPRMC | GPRMC for GPS only, GNRMC for multiple systems combined
+2 | utc | UTC of position
+3 | pos status | status of position, A valid, V invalid
+4 | lat | DDmm.mm
+5 | lat dir | N or S
+6 | lon | DDDmm.mm
+7 | lon dir | E or W
+8 | speed Kn | speed over ground, knots
+9 | track true | track made good, degrees true
+10 | date | date dd/mm/yy
+11 | mag var | actual magnetic variation, always positive
+12 | var dir | direction of magnetic variation E/W 
+13 | mode ind | position mode indicator (see table in GPGLL)
+14 | *xx | checksum
+
+
+For magnetic variation: E subtract var from true course, W add var to true course
+
+#### GNVTG Track made good and ground speed (for multi GNSS solution)
+
+[description](https://docs.novatel.com/OEM7/Content/Logs/GPVTG.htm)
+
+If only GPS is used, then the header is GPVTG
+
+```
+$GNVTG,317.31,T,,M,0.00,N,0.00,K,D*21
+```
+
+Field | Structure | Description
+---|---|---
+1 | $GNVTG | GPVTG for GPS only, GNVTG for multi GNSS solution
+2 | track true | track made good, degrees true
+3 | T | true track indicator
+4 | track mag | track made good magnetic
+5 | M | magnetic track indicator
+6 | speed Kn | speed over ground, knots
+7 | N | nautical speed indicator
+8 | speed km | speed km/h
+9 | K | speed indicator (K=km/h)
+11 | mode ind | position mode indicator (see table in GPGLL)
+12 | *xx | checksum
+
+Note that track mag = Track True + MAGVAR correction
+
+## GNGGA GPS fix data and undulation (multi GNSS solution)
+
+[description](https://docs.novatel.com/OEM7/Content/Logs/GPGGA.htm)
+
+```
+$GNGGA,210156.000,5555.9592,N,00310.4012,W,2,15,0.69,50.7,M,49.6,M,,*52
+```
+Field | Structure | Description
+---|---|---
+1 | $GPRMC | GPRMC for GPS only, GNRMC for multiple systems combined
+2 | utc | UTC of position
+3 | lat | DDmm.mm
+4 | lat dir | N or S
+5 | lon | DDDmm.mm
+6 | lon dir | E or W
+7 | quality|  (see table)
+8 | # sats | number of satellites in use, may differ from number in view
+9 | hdop | horizontal dilution of position
+10 | alt | antenna altitude above/below mean sea level 
+11 | a-units | units of altitude (M = metres)
+12 | undulation | relationship between the geoid (mean sea level) and the WGS84 ellipsoid
+13 | u-units | units of undulation (M = metres)
+14 | age | age of correction data in seconds (max age is 99sec)
+15 | stn ID | differential base station ID (empty when no differential data is present)
+16 | *xx | checksum
+
+##### Quality
+
+Indicator | Description
+---|---
+0 | fix not available or invalid
+1 | single point or converging PPP (TerraStar-L)
+2 | single range differential, converged PPP (TerraStar-L) or converging PPP (TerraStar-C/C-Pro/X)
+3 | (indicator not defined)
+4 | TRK fixed ambiguity solution
+5 | RTK floating ambiguity solution (converged PPP for TerraStar-C/C-Pro/X)
+6 | Dead reckoning mode
+7 | Manual input mode (fixed position)
+8 | simulator mode
+9 | WASS (SBAS) - placeholder
+
+
+##### Dilution of Position (DOP)
+
+DOP is lower for more accurate results, obtained when satellites are farther apart in the sky or there are fewer obstructions.
+
+Table reproduced from [this Wikipedia article](https://en.wikipedia.org/wiki/Dilution_of_precision_&#40;navigation&#41;)
+
+DOP value | rating | Description
+---|---|---
+<1 | Ideal | Highest possible confidence level to be used for applications demanding the highest possible precision at all times.
+1-2| Excellent | At this confidence level, positional measurements are considered accurate enough to meet all but the most sensitive applications.
+2-5 | Good | Represents a level that marks the minimum appropriate for making accurate decisions. Positional measurements could be used to make reliable in-route navigation suggestions to the user.
+5-10 | Moderate | Positional measurements could be used for calculations, but the fix quality could still be improved. A more open view of the sky is recommended.
+10-20 | Fair | Represents a low confidence level. Positional measurements should be discarded or used only to indicate a very rough estimate of the current location.
+>20 | Poor | At this level, measurements are inaccurate by as much as 300 meters with a 6-meter accurate device (50 DOP × 6 meters) and should be discarded.
+
+DOP is the combined effect of HDOP and VDOP.
+
+##### Undulation
+
+Older GPS receivers incorrectly gave MSL because it was not known just how big was the difference between the ideal ellipsoid model of the earth, and the actual surface.
+
+MSL in newer receivers should have done the corrections already, although the [history](https://www.esri.com/news/arcuser/0703/geoid1of3.html) of this interesting.
+
+### GPGSA GPS DOP and active satellites
+ 
+[description](https://docs.novatel.com/OEM7/Content/Logs/GPGSA.htm)
+
+```
+$GPGSA,A,3,16,08,23,27,18,21,30,10,15,,,,1.03,0.69,0.76*09
+```
+
+$GNGSA if combined GNSS solution
+
+Field | Structure | Description
+---|---|---
+1 | $GPGSA | GPGAS for GPS only, GNGSA for multi-GNSS solution
+2 | mode | A automatic 2d/3d, manual (forced to operate in 2D or 3D)
+3 | mode 123 | mode: 1 = fix not available, 2 = 2D, 3 = 3D
+4 - 15 | prn | PRN numbers of satellites involved in the fix (null for unused, total of 12 fields)
+16 | pdop | position dilution of precision
+17 | hdop | horizontal dilution of precision
+18 | vdop | vertical diluation of precision
+19 | system ID | GNSS system id (NMEA version 4.11 only)
+20  *xx | checksum
+
+PRN: GPS 1 - 32, SBAS 33-64 (add 87 for PRN number), GLO 65- 96
+
+DOP is the combined effect of HDOP and VDOP.
+Note that as you'd expect from the example above: (0.76^2 + 0.69^2)^0.5 = 1.03 (2.d.p) 
+
+### BDGSA Beidou DOP and active satellites
+
+As above
+
+```
+$BDGSA,A,3,13,05,29,25,20,19,,,,,,,1.03,0.69,0.76*1E
+```
+
+
+### Matters arising in checking message formats
+
+TODO - check whether system will always produce GN* messages, or do we need to ensure we are robust to getting both GN* vs GP* versions of messages (if only GPS or other satellites are used). Obviously, a more general system will support getting the information from both types of message.
+
+TODO can we use altitude in GPGGA to estimate tide/wave height?
+
+TODO Flash a warning sign / cease plotting when HDOP becomes too poor (i.e. too high)
+
+### Parsing
+
+Parsing strings in C can be less fun than in other languages ... so it makes sense to find a parser that is already tested. There are several, of which LwGPS seems most promising.
+
+#### jacketizer/libnmea
+
+Parses into structs - does it support GN versions? An issue about hardcoded paths. Another issue about skipping hdop.Is it lightweight enough for pico? 180 stars, 72 forks.
+
+[github](https://github.com/jacketizer/libnmea)
+
+#### craigpeacock/NMEA-GPS
+
+Relies on strict ordering of fields in sentences. Lightweight
+
+[github](https://github.com/craigpeacock/NMEA-GPS)
+
+ 
+#### LwGPS
+
+Platform independent ANSI C99, lightweight, intended for embedded systems. 213 stars, 95 forks. All issues closed.
+
+Supports:
+
+GPGGA or GNGGA: GPS fix data
+GPGSA or GNGSA: GPS active satellites and dillusion of position
+GPGSV or GNGSV: List of satellites in view zone
+GPRMC or GNRMC: Recommended minimum specific GPS/Transit data
+
+[docs](https://docs.majerle.eu/projects/lwgps/en/latest/)
+[github](https://github.com/MaJerle/lwgps)
+
+
+
 
 ## Parts - Original options considered
 
