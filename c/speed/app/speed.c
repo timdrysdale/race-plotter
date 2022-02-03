@@ -55,6 +55,8 @@ void on_uart_rx() {
 }
 
 // Display frame
+#define FRAME_MS 2000
+
 volatile bool request_animate = false;
 
 bool set_request_animate(struct repeating_timer *t) {
@@ -71,20 +73,21 @@ UBYTE *BlackImage;
 void animate() {
     char ok;
     ok = (hgps.is_valid) ? 65 : 86;
-    printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
+    //printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
     Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
     Paint_SetScale(2);
     Paint_Clear(WHITE);
     char c[3];
-    sprintf(c, "%03.0f",hgps.course); 
+    //sprintf(c, "%03.0f",hgps.course); 
+    sprintf(c,"%03d",hgps.seconds);
     int i;
     for (i = 0; i < 3; i ++) {
 	c[i] -=  16;
     } 
     Paint_DrawString_EN(5,75, c, &Font189, WHITE, BLACK);
     EPD_3IN7_1Gray_Display(BlackImage);
-    printf("display updated with %s\n",c);
+    //printf("display updated with %s\n",c);
     
 }
 
@@ -183,7 +186,7 @@ int main() {
 	// Setup timer for managing refresh of the display every 1second
 	struct repeating_timer timer;
 	
-	add_repeating_timer_ms(2000, set_request_animate, NULL, &timer);
+	add_repeating_timer_ms(FRAME_MS, set_request_animate, NULL, &timer);
 
 
   
