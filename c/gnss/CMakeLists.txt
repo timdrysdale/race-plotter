@@ -22,6 +22,9 @@ include_directories(lwgps/src/include)
 include_directories(.)
 add_subdirectory(lwgps/src/lwgps)
 
+include_directories(lwrb/src/include)
+add_subdirectory(lwrb/src/lwrb)
+
 # Add hello world example
 add_subdirectory(hello_world)
 
