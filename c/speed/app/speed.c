@@ -13,6 +13,12 @@
 #include <string.h>
 
 #include "EPD_3in7.h"
+#include "DEV_Config.h"
+#include "GUI_Paint.h"
+#include "ImageData.h"
+#include "Debug.h"
+#include <stdlib.h> // malloc() free()
+
 
 /// \tag::uart_advanced[]
 
@@ -124,8 +130,31 @@ int main() {
 	struct repeating_timer timer;
 	
 	add_repeating_timer_ms(1000, set_request_animate, NULL, &timer);
-	
-	
+
+	// initialise the ink display
+    if(DEV_Module_Init()!=0){
+        return -1;
+    }
+
+	 EPD_3IN7_1Gray_Init();
+    EPD_3IN7_1Gray_Clear();
+    DEV_Delay_ms(500);
+
+	//Create a new image cache
+    UBYTE *BlackImage;
+    /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
+    UWORD Imagesize = ((EPD_3IN7_WIDTH % 4 == 0)? (EPD_3IN7_WIDTH / 4 ): (EPD_3IN7_WIDTH / 4 + 1)) * EPD_3IN7_HEIGHT;
+    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
+        printf("Failed to apply for black memory...\r\n");
+        return -1;
+    }
+
+	Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
+    Paint_SelectImage(BlackImage);
+    Paint_SetScale(2);
+    Paint_Clear(WHITE);
+    Paint_DrawString_EN(5,75, "\")(", &Font189, WHITE, BLACK);
+	EPD_3IN7_1Gray_Display(BlackImage);
 
 	while (1) {
 
