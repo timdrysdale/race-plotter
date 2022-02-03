@@ -424,7 +424,7 @@ The main difference between partial and full refresh is that the screen is not c
 
 This would allow the individual components to have their own renderers. Except that the shift bar crosses three different buffers.
 
-Perhaps in the first instance, the whole screen is rendered, but only presented for a partial refresh, to avoid the flickering. The same approximate amount of writing to the screen will be done in any case, without the overhead of starting and stopping the write for different regions, so there is only likely to be a minor performance penalty, if not an advantage.
+TL;DR. The screen can only do 2sec updates if writing the whole buffer, or 3sec if also using printf. Hence, benefit to using partial refresh, and selectively overwriting only those parts that have changed. This may become a limitation of compass mode where all three digits can change e.g. going from 099 to 100. Perhaps the bar writing routine will have to figure out how to "patch" the bar. 
 
 
 
