@@ -68,13 +68,15 @@ const char deg=176; //deg symbol
 
 //Create a new image cache
 UBYTE *BlackImage;
-
+UBYTE *CharImage;
 
 void animate() {
     char ok;
     ok = (hgps.is_valid) ? 65 : 86;
     //printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
-    Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
+    printf("%02d:%02d\n",hgps.minutes,hgps.seconds);
+    //Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
+    Paint_NewImage(BlackImage, 200, 200, 90, WHITE);
     Paint_SelectImage(BlackImage);
     Paint_SetScale(2);
     Paint_Clear(WHITE);
@@ -85,8 +87,10 @@ void animate() {
     for (i = 0; i < 3; i ++) {
 	c[i] -=  16;
     } 
-    Paint_DrawString_EN(5,75, c, &Font189, WHITE, BLACK);
-    EPD_3IN7_1Gray_Display(BlackImage);
+
+    Paint_DrawChar(5,5, c[2], &Font189, BLACK, WHITE); //c[2]
+    //Paint_DrawString_EN(5,100, "Hi", &Font24, WHITE, BLACK);
+    EPD_3IN7_1Gray_Display_Part(BlackImage, 8, 8, 208,208);
     //printf("display updated with %s\n",c);
     
 }
@@ -156,23 +160,29 @@ int main() {
         return -1;
     }
 
-
-    EPD_3IN7_1Gray_Init();
-    EPD_3IN7_1Gray_Clear();
+    Imagesize = ((200 % 4 == 0)? (200 / 4 ): (200 / 4 + 1)) * 200;
+    if((CharImage = (UBYTE *)malloc(Imagesize)) == NULL) {
+        printf("Failed to apply for char memory...\r\n");
+        return -1;
+    }
 
 
     Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
-    Paint_SetScale(2);
+    Paint_SetScale(4);
     Paint_Clear(WHITE);
-    Paint_DrawString_EN(200,75, "SPEED-SHIFT", &Font24, WHITE, BLACK);
-    Paint_DrawString_EN(200,95, "    v0.1", &Font24, WHITE, BLACK);
-    EPD_3IN7_1Gray_Display(BlackImage);
+    //Paint_DrawString_EN(200,75, "SPEED-SHIFT", &Font24, WHITE, BLACK);
+    //Paint_DrawString_EN(200,95, "    v0.1", &Font24, WHITE, BLACK);
+
+    EPD_3IN7_4Gray_Display(BlackImage);
     DEV_Delay_ms(1000);
 
-    EPD_3IN7_1Gray_Clear();
+    //EPD_3IN7_4Gray_Clear();
 
     DEV_Delay_ms(500);
+    EPD_3IN7_1Gray_Init();
+    EPD_3IN7_1Gray_Clear();
+
 
 	// lwGPS setup
 	uint8_t rx;
