@@ -52,7 +52,8 @@ volatile bool request_animate = false;
 
 bool set_request_animate(struct repeating_timer *t) {
   request_animate = true;
-    return true;
+   printf("set_request_animate()\n");
+   return true;
 }
 
 void animate() {
@@ -132,6 +133,7 @@ int main() {
                 lwgps_process(&hgps, &rx, 1);   /* Process byte-by-byte */
             }
         } else if  (request_animate > 0 ){
+	                printf("request_animate\n");
 			request_animate = false;
 			animate();
 		}
