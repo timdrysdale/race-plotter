@@ -47,6 +47,21 @@ void on_uart_rx() {
     }
 }
 
+// Display frame
+volatile bool request_animate = false;
+
+bool set_request_animate(struct repeating_timer *t) {
+  request_animate = true;
+    return true;
+}
+
+void animate() {
+     /* Print all data after successful processing */
+    printf("Latitude: %f degrees\r\n", hgps.latitude);
+    printf("Longitude: %f degrees\r\n", hgps.longitude);
+    printf("Altitude: %f meters\r\n", hgps.altitude);
+}
+
 int main() {
 
      // initialise the USB for printf
@@ -100,6 +115,12 @@ int main() {
 
     /* Create buffer for received data */
     lwrb_init(&hgps_buff, hgps_buff_data, sizeof(hgps_buff_data));
+
+	// Setup timer for managing refresh of the display every 1second
+	struct repeating_timer timer;
+	
+	add_repeating_timer_ms(1000, set_request_animate, NULL, &timer);
+	
 	
 
 	while (1) {
@@ -110,13 +131,10 @@ int main() {
             while (lwrb_read(&hgps_buff, &rx, 1) == 1) {
                 lwgps_process(&hgps, &rx, 1);   /* Process byte-by-byte */
             }
-        } else {
-            /* Print all data after successful processing */
-            printf("Latitude: %f degrees\r\n", hgps.latitude);
-            printf("Longitude: %f degrees\r\n", hgps.longitude);
-            printf("Altitude: %f meters\r\n", hgps.altitude);
-        }
-		
+        } else if  (request_animate > 0 ){
+			request_animate = false;
+			animate();
+		}
 	}
 	 
 }
