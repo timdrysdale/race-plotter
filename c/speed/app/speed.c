@@ -83,7 +83,7 @@ void animate() {
 	c[i] -=  16;
     } 
     Paint_DrawString_EN(5,75, c, &Font189, WHITE, BLACK);
-    EPD_3IN7_1Gray_Display_Part(BlackImage, 0, 0, 280, 480);
+    EPD_3IN7_1Gray_Display(BlackImage);
     printf("display updated with %s\n",c);
     
 }
@@ -154,6 +154,8 @@ int main() {
     }
 
 
+    EPD_3IN7_1Gray_Init();
+    EPD_3IN7_1Gray_Clear();
 
 
     Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
@@ -165,8 +167,8 @@ int main() {
     EPD_3IN7_1Gray_Display(BlackImage);
     DEV_Delay_ms(1000);
 
-    EPD_3IN7_4Gray_Init();
-    EPD_3IN7_4Gray_Clear();
+    EPD_3IN7_1Gray_Clear();
+
     DEV_Delay_ms(500);
 
 	// lwGPS setup
