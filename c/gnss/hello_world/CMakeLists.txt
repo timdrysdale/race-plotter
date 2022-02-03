@@ -4,7 +4,7 @@ if (TARGET tinyusb_device)
             )
 
     # pull in common dependencies
-    target_link_libraries(hello_usb pico_stdlib hardware_uart lwgps m)
+    target_link_libraries(hello_usb pico_stdlib hardware_uart lwgps lwrb m)
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(hello_usb 1)
