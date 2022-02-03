@@ -25,6 +25,8 @@ add_subdirectory(lwgps/src/lwgps)
 include_directories(lwrb/src/include)
 add_subdirectory(lwrb/src/lwrb)
 
+add_subdirectory(ink)
+
 # Add app directory where our main code is
 add_subdirectory(app)
 
