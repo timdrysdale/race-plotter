@@ -19,6 +19,7 @@ pico_sdk_init()
 include(example_auto_set_url.cmake)
 
 include_directories(lwgps/src/include)
+include_directories(.)
 add_subdirectory(lwgps/src/lwgps)
 
 # Add hello world example
