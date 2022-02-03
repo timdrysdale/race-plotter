@@ -25,6 +25,11 @@ add_subdirectory(lwgps/src/lwgps)
 include_directories(lwrb/src/include)
 add_subdirectory(lwrb/src/lwrb)
 
+include_directories(ink/lib/Config)
+include_directories(ink/lib/e-Paper)
+include_directories(ink/lib/Fonts)
+include_directories(ink/lib/GUI)
+
 add_subdirectory(ink)
 
 # Add app directory where our main code is

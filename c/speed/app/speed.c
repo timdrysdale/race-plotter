@@ -12,7 +12,6 @@
 #include "lwrb/lwrb.h"
 #include <string.h>
 
-#include "EPD_Test.h"
 #include "EPD_3in7.h"
 
 /// \tag::uart_advanced[]
