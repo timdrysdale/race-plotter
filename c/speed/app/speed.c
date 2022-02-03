@@ -55,7 +55,7 @@ void on_uart_rx() {
 }
 
 // Display frame
-#define FRAME_MS 2000
+#define FRAME_MS 1000
 
 volatile bool request_animate = false;
 
