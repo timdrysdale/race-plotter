@@ -64,15 +64,36 @@ bool set_request_animate(struct repeating_timer *t) {
 
 const char deg=176; //deg symbol
 
+//Create a new image cache
+UBYTE *BlackImage;
+
+
 void animate() {
     char ok;
     ok = (hgps.is_valid) ? 65 : 86;
     printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
-
+    Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
+    Paint_SelectImage(BlackImage);
+    Paint_SetScale(2);
+    Paint_Clear(WHITE);
+    char c[3];
+    sprintf(c, "%03.0f",hgps.course); 
+    int i;
+    for (i = 0; i < 3; i ++) {
+	c[i] -=  16;
+    } 
+    Paint_DrawString_EN(5,75, c, &Font189, WHITE, BLACK);
+    EPD_3IN7_1Gray_Display_Part(BlackImage, 0, 0, 280, 480);
+    printf("display updated with %s\n",c);
+    
 }
 
-int main() {
+// Ink
 
+
+int main() {
+ 
+  
      // initialise the USB for printf
     stdio_init_all();
   
@@ -115,6 +136,41 @@ int main() {
     // Lets send a basic string out, and then run a loop and wait for RX interrupts
     // The handler will count them, but also reflect the incoming data back with a slight change!
     //uart_puts(UART_ID, "\nHello, uart interrupts\n");
+    // initialise the ink display
+    if(DEV_Module_Init()!=0){
+        return -1;
+    }
+
+ 
+  /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
+    UWORD Imagesize = ((EPD_3IN7_WIDTH % 4 == 0)? (EPD_3IN7_WIDTH / 4 ): (EPD_3IN7_WIDTH / 4 + 1)) * EPD_3IN7_HEIGHT;
+    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
+        printf("Failed to apply for black memory...\r\n");
+        return -1;
+    }
+    
+    // clean the screen properly by sleep/exiting.
+    EPD_3IN7_Sleep();
+    DEV_Delay_ms(2000);//important, at least 2s
+    DEV_Module_Exit();
+
+    if(DEV_Module_Init()!=0){
+        return -1;
+    }
+
+    EPD_3IN7_1Gray_Init();
+    EPD_3IN7_1Gray_Clear();
+    DEV_Delay_ms(500);
+
+    Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
+    Paint_SelectImage(BlackImage);
+    Paint_SetScale(2);
+    Paint_Clear(WHITE);
+    Paint_DrawString_EN(200,75, "SPEED-SHIFT", &Font24, WHITE, BLACK);
+    Paint_DrawString_EN(220,75, "    v0.1", &Font24, WHITE, BLACK);
+
+    EPD_3IN7_1Gray_Display(BlackImage);
+    DEV_Delay_ms(1000);
 
 	// lwGPS setup
 	uint8_t rx;
@@ -128,33 +184,12 @@ int main() {
 	// Setup timer for managing refresh of the display every 1second
 	struct repeating_timer timer;
 	
-	add_repeating_timer_ms(1000, set_request_animate, NULL, &timer);
+	add_repeating_timer_ms(5000, set_request_animate, NULL, &timer);
 
-	// initialise the ink display
-    if(DEV_Module_Init()!=0){
-        return -1;
-    }
 
-	 EPD_3IN7_1Gray_Init();
-    EPD_3IN7_1Gray_Clear();
-    DEV_Delay_ms(500);
+  
 
-	//Create a new image cache
-    UBYTE *BlackImage;
-    /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
-    UWORD Imagesize = ((EPD_3IN7_WIDTH % 4 == 0)? (EPD_3IN7_WIDTH / 4 ): (EPD_3IN7_WIDTH / 4 + 1)) * EPD_3IN7_HEIGHT;
-    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
-        printf("Failed to apply for black memory...\r\n");
-        return -1;
-    }
-
-	Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
-    Paint_SelectImage(BlackImage);
-    Paint_SetScale(2);
-    Paint_Clear(WHITE);
-    Paint_DrawString_EN(5,75, "\")(", &Font189, WHITE, BLACK);
-	EPD_3IN7_1Gray_Display(BlackImage);
-
+    
 	while (1) {
 
         /* Process all input data */
@@ -168,7 +203,7 @@ int main() {
 			animate();
 		}
 	}
-	 
+
 }
 
 /// \end:uart_advanced[]
