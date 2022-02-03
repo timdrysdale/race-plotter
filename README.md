@@ -349,7 +349,7 @@ $BDGSA,A,3,13,05,29,25,20,19,,,,,,,1.03,0.69,0.76*1E
 
 TODO - check whether system will always produce GN* messages, or do we need to ensure we are robust to getting both GN* vs GP* versions of messages (if only GPS or other satellites are used). Obviously, a more general system will support getting the information from both types of message.
 
-TODO can we use altitude in GPGGA to estimate tide/wave height?
+CAN't DO: can we use altitude in GPGGA to estimate tide/wave height? No, the altitude is too inaccurate (in testing have noticed >5m jumps for stationary antenna and variations over 40m, which is bigger than the effect of waves/tide)
 
 TODO Flash a warning sign / cease plotting when HDOP becomes too poor (i.e. too high)
 
@@ -406,6 +406,26 @@ Covering the antenna completely with hands causes position quality to drop to Fa
 [V/99.990000] 00:56:52 UTC @(55.932752,-3.172750) z=50.500000m s=2.730000Kn c=64.440000°
 [V/0.000000] 00:56:53 UTC @(0.000000,0.000000) z=0.000000m s=1.690000Kn c=77.000000°
 ```
+
+## Display design
+
+With a small 3.7in display mounted some 12 ft from the helm, only one numerical display is possible. For the case where a boat already has a compass and a paddle wheel for speed, then a useful display would be speed over ground, and relative shift in course over ground. This would help infer tidal flow and leeway (assuming there is crew available to cross-reference three instruments). A visually simple style would reduce cognitive loading / speed up reading the instrument. Devices such as the speedpuck have to use separate elements to make graphic indicators, because of the limitations of LCD technology. No such limitations apply to the e-paper so we are free to adopt continuous line styles with rounded ends that mirror the aviation instrumentation font. It is unavoidable that the decimal place is off centre. Therefore the shift indicator has to be on the top side to avoid two circles near other, but not vertically aligned. The spacing of the digits may be controlled by writing each of them separately as individual characters. 
+
+![speed-shift](./img/speed-big-shift.png) 
+
+![speed-stbd](./img/speed-shift-stbd.png)
+
+
+### Refresh strategy
+
+The main difference between partial and full refresh is that the screen is not cycled to grey/black and back for 3s. Usually a subset of the screen is written, with the X_start being a multiple of 8. If we want to do lots of smaller updates, then the individual regions could be separated into non-overlapping rectangles like this:
+
+![partial-regions](./img/speed-shift-refresh-regions.png)
+
+This would allow the individual components to have their own renderers. Except that the shift bar crosses three different buffers.
+
+Perhaps in the first instance, the whole screen is rendered, but only presented for a partial refresh, to avoid the flickering. The same approximate amount of writing to the screen will be done in any case, without the overhead of starting and stopping the write for different regions, so there is only likely to be a minor performance penalty, if not an advantage.
+
 
 
 
