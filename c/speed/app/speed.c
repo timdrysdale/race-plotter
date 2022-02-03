@@ -15,7 +15,6 @@
 #include "EPD_3in7.h"
 #include "DEV_Config.h"
 #include "GUI_Paint.h"
-#include "ImageData.h"
 #include "Debug.h"
 #include <stdlib.h> // malloc() free()
 
