@@ -385,6 +385,28 @@ GPRMC or GNRMC: Recommended minimum specific GPS/Transit data
 [github](https://github.com/MaJerle/lwgps)
 
 
+### Performance
+
+The quality of the GPS signal is reported as Excellent (DOP_H = 0.78) when the antenna is in the window. 
+
+```
+[A/0.780000] 00:53:54 UTC @(xx.xxxx,xx.xxxx) z=xxxxm s=0.000000Kn c=257.010000°
+```
+
+It falls to Good when taken a few metres inside the house, with spurious non-zero speed readings while the antenna is stationary.
+```
+[A/2.590000] 00:53:45 UTC @(xx.xxxx,xx.xxx) z=xxxm s=1.050000Kn c=52.340000°
+```
+Covering the antenna completely with hands causes position quality to drop to Fair, or even invalid 
+
+```
+[V/0.000000] 00:56:49 UTC @(0.000000,0.000000) z=0.000000m s=0.210000Kn c=150.910000°
+[A/15.330000] 00:56:50 UTC @(55.932733,-3.172743) z=50.500000m s=2.600000Kn c=91.260000°
+[A/15.350000] 00:56:51 UTC @(55.932738,-3.172763) z=50.500000m s=2.610000Kn c=73.470000°
+[V/99.990000] 00:56:52 UTC @(55.932752,-3.172750) z=50.500000m s=2.730000Kn c=64.440000°
+[V/0.000000] 00:56:53 UTC @(0.000000,0.000000) z=0.000000m s=1.690000Kn c=77.000000°
+```
+
 
 
 ## Parts - Original options considered
