@@ -141,36 +141,33 @@ int main() {
         return -1;
     }
 
- 
+    EPD_3IN7_4Gray_Init();
+    EPD_3IN7_4Gray_Clear();
+    DEV_Delay_ms(500);
+
+
   /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
     UWORD Imagesize = ((EPD_3IN7_WIDTH % 4 == 0)? (EPD_3IN7_WIDTH / 4 ): (EPD_3IN7_WIDTH / 4 + 1)) * EPD_3IN7_HEIGHT;
     if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
         printf("Failed to apply for black memory...\r\n");
         return -1;
     }
-    
-    // clean the screen properly by sleep/exiting.
-    EPD_3IN7_Sleep();
-    DEV_Delay_ms(2000);//important, at least 2s
-    DEV_Module_Exit();
 
-    if(DEV_Module_Init()!=0){
-        return -1;
-    }
 
-    EPD_3IN7_1Gray_Init();
-    EPD_3IN7_1Gray_Clear();
-    DEV_Delay_ms(500);
+
 
     Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
     Paint_SetScale(2);
     Paint_Clear(WHITE);
     Paint_DrawString_EN(200,75, "SPEED-SHIFT", &Font24, WHITE, BLACK);
-    Paint_DrawString_EN(220,75, "    v0.1", &Font24, WHITE, BLACK);
-
+    Paint_DrawString_EN(200,95, "    v0.1", &Font24, WHITE, BLACK);
     EPD_3IN7_1Gray_Display(BlackImage);
     DEV_Delay_ms(1000);
+
+    EPD_3IN7_4Gray_Init();
+    EPD_3IN7_4Gray_Clear();
+    DEV_Delay_ms(500);
 
 	// lwGPS setup
 	uint8_t rx;
@@ -184,7 +181,7 @@ int main() {
 	// Setup timer for managing refresh of the display every 1second
 	struct repeating_timer timer;
 	
-	add_repeating_timer_ms(5000, set_request_animate, NULL, &timer);
+	add_repeating_timer_ms(2000, set_request_animate, NULL, &timer);
 
 
   
