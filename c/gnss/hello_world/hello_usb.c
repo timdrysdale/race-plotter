@@ -52,15 +52,16 @@ volatile bool request_animate = false;
 
 bool set_request_animate(struct repeating_timer *t) {
   request_animate = true;
-   printf("set_request_animate()\n");
-   return true;
+  return true;
 }
 
+const char deg=176; //deg symbol
+
 void animate() {
-     /* Print all data after successful processing */
-    printf("Latitude: %f degrees\r\n", hgps.latitude);
-    printf("Longitude: %f degrees\r\n", hgps.longitude);
-    printf("Altitude: %f meters\r\n", hgps.altitude);
+    char ok;
+    ok = (hgps.is_valid) ? 65 : 86;
+    printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
+
 }
 
 int main() {
@@ -133,7 +134,6 @@ int main() {
                 lwgps_process(&hgps, &rx, 1);   /* Process byte-by-byte */
             }
         } else if  (request_animate > 0 ){
-	                printf("request_animate\n");
 			request_animate = false;
 			animate();
 		}
