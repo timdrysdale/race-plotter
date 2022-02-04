@@ -424,9 +424,9 @@ The main difference between partial and full refresh is that the screen is not c
 
 This would allow the individual components to have their own renderers. Except that the shift bar crosses three different buffers.
 
-TL;DR. The screen can only do 2sec updates if writing the whole buffer, or 3sec if also using printf. Hence, benefit to using partial refresh, and selectively overwriting only those parts that have changed. This may become a limitation of compass mode where all three digits can change e.g. going from 099 to 100. Perhaps the bar writing routine will have to figure out how to "patch" the bar. 
+TL;DR. The screen can only do 2sec updates if writing the whole buffer, or 3sec if also using printf. Hence, benefit to using partial refresh, and selectively overwriting only those parts that have changed. This may become a limitation of compass mode where all three digits can change e.g. going from 099 to 100. Perhaps the bar writing routine will have to figure out how to "patch" the bar - bearing in mind that you can only have one partial refresh area. For what it is worth, the one second update rate works ok with a 200px by 200px box, showing the least significant digit of the seconds taken from the gps.
 
-
+The 9600 baud rate is probably an issue here.
 
 
 ## Parts - Original options considered
