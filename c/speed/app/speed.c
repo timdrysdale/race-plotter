@@ -69,7 +69,6 @@ const char deg=176; //deg symbol
 //Create a new image cache
 UBYTE *BlackImage;
 UBYTE *CharImage;
-bool left;
 
 void animate() {
     char ok;
@@ -77,7 +76,7 @@ void animate() {
 
     //printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
     printf("%02d:%02d\n",hgps.minutes,hgps.seconds);
-   char c[3];
+    char c[3];
 
     int t = hgps.seconds;
     sprintf(c,"%03d",t);
@@ -86,24 +85,13 @@ void animate() {
         c[i] -=  16;
     } 
 
-    left = !left;
-
-    if (left) {
     Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
     Paint_SetScale(2);
     Paint_Clear(WHITE);
-    Paint_DrawChar(5,5, c[2], &Font189, BLACK, WHITE); 
+    Paint_DrawString_EN(5,5, c, &Font189, WHITE, BLACK); 
     EPD_3IN7_1Gray_Display(BlackImage);
-    } else {
-
-    Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
-    Paint_SelectImage(BlackImage);
-    Paint_SetScale(2);
-    Paint_Clear(WHITE);
-    Paint_DrawChar(150,5, c[2], &Font189, BLACK, WHITE); 
-    EPD_3IN7_1Gray_Display(BlackImage);
-  }
+    
 }
 
 // Ink
