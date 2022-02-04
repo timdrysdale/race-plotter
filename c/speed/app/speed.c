@@ -55,7 +55,7 @@ void on_uart_rx() {
 }
 
 // Display frame
-#define FRAME_MS 1000
+#define FRAME_MS 2000
 
 volatile bool request_animate = false;
 
@@ -69,6 +69,7 @@ const char deg=176; //deg symbol
 //Create a new image cache
 UBYTE *BlackImage;
 UBYTE *CharImage;
+bool left;
 
 void animate() {
     char ok;
@@ -82,7 +83,8 @@ void animate() {
     Paint_Clear(WHITE);
     char c[3];
     //sprintf(c, "%03.0f",hgps.course); 
-    sprintf(c,"%03d",hgps.seconds);
+    int t = hgps.seconds;
+    sprintf(c,"%03d",t);
     int i;
     for (i = 0; i < 3; i ++) {
 	c[i] -=  16;
@@ -90,7 +92,13 @@ void animate() {
 
     Paint_DrawChar(5,5, c[2], &Font189, BLACK, WHITE); //c[2]
     //Paint_DrawString_EN(5,100, "Hi", &Font24, WHITE, BLACK);
-    EPD_3IN7_1Gray_Display_Part(BlackImage, 8, 8, 208,208);
+
+    int dx;
+    
+    dx = (left)? 0 : 200;
+    left = !left;
+
+    EPD_3IN7_1Gray_Display_Part(BlackImage, 8, 8+dx, 208,208+dx);
     //printf("display updated with %s\n",c);
     
 }
