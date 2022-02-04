@@ -74,33 +74,36 @@ bool left;
 void animate() {
     char ok;
     ok = (hgps.is_valid) ? 65 : 86;
+
     //printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
     printf("%02d:%02d\n",hgps.minutes,hgps.seconds);
-    //Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
-    Paint_NewImage(BlackImage, 200, 200, 90, WHITE);
-    Paint_SelectImage(BlackImage);
-    Paint_SetScale(2);
-    Paint_Clear(WHITE);
-    char c[3];
-    //sprintf(c, "%03.0f",hgps.course); 
+   char c[3];
+
     int t = hgps.seconds;
     sprintf(c,"%03d",t);
     int i;
     for (i = 0; i < 3; i ++) {
-	c[i] -=  16;
+        c[i] -=  16;
     } 
 
-    Paint_DrawChar(5,5, c[2], &Font189, BLACK, WHITE); //c[2]
-    //Paint_DrawString_EN(5,100, "Hi", &Font24, WHITE, BLACK);
-
-    int dx;
-    
-    dx = (left)? 0 : 200;
     left = !left;
 
-    EPD_3IN7_1Gray_Display_Part(BlackImage, 8, 8+dx, 208,208+dx);
-    //printf("display updated with %s\n",c);
-    
+    if (left) {
+    Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
+    Paint_SelectImage(BlackImage);
+    Paint_SetScale(2);
+    Paint_Clear(WHITE);
+    Paint_DrawChar(5,5, c[2], &Font189, BLACK, WHITE); 
+    EPD_3IN7_1Gray_Display(BlackImage);
+    } else {
+
+    Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
+    Paint_SelectImage(BlackImage);
+    Paint_SetScale(2);
+    Paint_Clear(WHITE);
+    Paint_DrawChar(150,5, c[2], &Font189, BLACK, WHITE); 
+    EPD_3IN7_1Gray_Display(BlackImage);
+  }
 }
 
 // Ink
@@ -168,7 +171,7 @@ int main() {
         return -1;
     }
 
-    Imagesize = ((200 % 4 == 0)? (200 / 4 ): (200 / 4 + 1)) * 200;
+    //Imagesize = ((200 % 4 == 0)? (200 / 4 ): (200 / 4 + 1)) * 200;
     if((CharImage = (UBYTE *)malloc(Imagesize)) == NULL) {
         printf("Failed to apply for char memory...\r\n");
         return -1;
