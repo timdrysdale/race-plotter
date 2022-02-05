@@ -77,12 +77,12 @@ void animate() {
 
     //printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
     //printf("%02d:%02d\n",hgps.minutes,hgps.seconds);
-    char c[3];
+    char c[2];
 
     int t = hgps.seconds;
-    sprintf(c,"%03d",t);
+    sprintf(c,"%02d",t);
     int i;
-    for (i = 0; i < 3; i ++) {
+    for (i = 0; i < 2; i ++) {
         c[i] -=  16;
     } 
 
@@ -90,7 +90,15 @@ void animate() {
     Paint_SelectImage(BlackImage);
     Paint_SetScale(2);
     Paint_Clear(WHITE);
-    Paint_DrawString_EN(5,5, c, &Font189, WHITE, BLACK); 
+
+    Paint_DrawChar(25,90, 33, &Font189, BLACK, WHITE);
+    Paint_DrawString_EN(125,90, c, &Font189, WHITE, BLACK);
+
+    //Paint_DrawRectangle(65,103,89, 265, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    //Paint_DrawCircle(77,103,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    //Paint_DrawCircle(77,265,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+ 
     EPD_3IN7_1Gray_Display(BlackImage);
     
 }
@@ -188,21 +196,17 @@ int main() {
 
 	// Setup timer for managing refresh of the display every 1second
 	struct repeating_timer timer;
-	
-	add_repeating_timer_ms(FRAME_MS, set_request_animate, NULL, &timer);
+        add_repeating_timer_ms(FRAME_MS, set_request_animate, NULL, &timer);
 
 
-  
+
 
     // Change baudrate
     char changebaud[] = "$PQBAUD,W,115200*43\r\n";
-    printf("\nCHANGE BAUD\n");
     uart_puts(UART_ID, changebaud);
-    
     int __unused actual = uart_set_baudrate(UART_ID, BAUD_RATE);
 
-    printf("changed baudrate\n");
-    
+
 	while (1) {
 
         /* Process all input data */
