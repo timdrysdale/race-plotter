@@ -84,10 +84,18 @@ UBYTE *CharImage;
 // maximum shift bar is equal to this many degrees:
 #define MAX_DEG 48
 
+float arcf() {
+  return (float) M_PI_2 * CORNER_RADIUS; //quarter circumference     
+}
+
+int arci() {
+  return (int) arcf();
+}
+
+
 // maximum shift in pixels we can show
 int maxshift() {
-        int arc = M_PI_2 * CORNER_RADIUS;
-	return CORNER_X + arc + SIDE_LENGTH;
+	return CORNER_X + arci() + SIDE_LENGTH;
 }
 
 // position of the X-coordinate of middle of the bar for a given shift value in pixels
@@ -106,10 +114,8 @@ int shiftx(int shift){
       return X_OFFSET + (direction * shift);
     }
 
-    float arc = M_PI_2 * CORNER_RADIUS; //quarter circumference 
-
-    if  (shift <= (CORNER_X + (int)arc)) {
-      float angle = (float) (shift - CORNER_X) / arc * M_PI_2;
+    if  (shift <= (CORNER_X + arci())) {
+      float angle = (float) (shift - CORNER_X) / arcf() * M_PI_2;
       return X_OFFSET + direction * ( CORNER_X + (int) (CORNER_RADIUS * sinf(angle))); //sinf for float, sin for double
    }
 
@@ -128,7 +134,7 @@ int shifty(int shift) {
 
     float arc = M_PI_2 * CORNER_RADIUS; //quarter circumference 
 
-    if  (shift <= (CORNER_X + (int)arc)) {
+    if  (shift <= (CORNER_X + arci())) {
 
       float angle = (float) (shift - CORNER_X) / arc * M_PI_2;
 
@@ -137,8 +143,19 @@ int shifty(int shift) {
 
    // vertical line, does not need arc length in it
    return Y_OFFSET + CORNER_RADIUS + shift - CORNER_X - arc;
-
 }
+
+
+
+
+bool do_vert(int shift) {
+  return (abs(shift) > (CORNER_X + arci())); 
+}
+
+bool do_curve(int shift) {
+  return (abs(shift) > CORNER_X); 
+}
+
 
 int pseudoshift;
 
@@ -166,14 +183,35 @@ void animate() {
     // shift indicator
 
     int shift = shiftdeg() * 480 / MAX_DEG; //intermediate results are int so order matters?
-  
-    int i;
     int sgn = (shift > 0)? 1 :-1;
+	
+    int i;
     
-    for (i=1; i < abs(shift); i++) {
-        Paint_DrawCircle(shiftx(i*sgn), shifty(i*sgn), HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    //for (i=1; i < abs(shift); i++) {
+    //Paint_DrawCircle(shiftx(i*sgn), shifty(i*sgn), HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    //}
+
+    //Draw the horizontal bar (maximum value CORNER_X, handle sign for -ve shift)
+    int hshift = (abs(shift) > CORNER_X) ? ((shift > 0) ? CORNER_X : -CORNER_X) : shift;
+    Paint_DrawRectangle(X_OFFSET,Y_OFFSET-HALF_BAR, X_OFFSET+hshift, Y_OFFSET+HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);  
+
+    if (do_vert(shift)){
+      int x = X_OFFSET + (sgn * (CORNER_X+CORNER_RADIUS));
+      Paint_DrawRectangle(x - HALF_BAR,Y_OFFSET+CORNER_RADIUS, x + HALF_BAR, shifty(shift), BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     }
 
+    if (do_curve(shift)) {
+
+        int start = abs(hshift);
+        int stop = abs(shift);
+        for (i = start; i<stop;){
+         Paint_DrawCircle(shiftx(i*sgn), shifty(i*sgn), HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+         i += 2;
+        }
+    }
+    // Draw the end
+    Paint_DrawCircle(shiftx(shift), shifty(shift), HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+ 
 	printf("%d->%d end@(%d,%d)\n",shiftdeg(), shift, shiftx(shift), shifty(shift));
     // draw line
     //Paint_DrawRectangle(X_OFFSET,Y_OFFSET-HALF_BAR, X_OFFSET+shift, Y_OFFSET+HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
