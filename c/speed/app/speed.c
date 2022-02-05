@@ -93,12 +93,14 @@ int maxshift() {
 // position of the X-coordinate of middle of the bar for a given shift value in pixels
 int shiftx(int shift){
 
+    int direction = (shift > 0)? 1 : -1;
+    
+    shift = abs(shift);
+    
     if (shift == 0) {
       return X_OFFSET;
     }
 
-    int abs_shift = abs(shift);
-    int direction = (shift > 0)? 1 : -1;
 
     if (shift <= CORNER_X) {
       return X_OFFSET + (direction * shift);
@@ -118,6 +120,8 @@ int shiftx(int shift){
 
 int shifty(int shift) {
 
+    shift = abs(shift);
+  
     if (shift <= CORNER_X) {
 	return Y_OFFSET;
     }
@@ -164,8 +168,10 @@ void animate() {
     int shift = shiftdeg() * 480 / MAX_DEG; //intermediate results are int so order matters?
   
     int i;
-    for (i=1; i < shift; i++) {
-        Paint_DrawCircle(shiftx(i), shifty(i), HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    int sgn = (shift > 0)? 1 :-1;
+    
+    for (i=1; i < abs(shift); i++) {
+        Paint_DrawCircle(shiftx(i*sgn), shifty(i*sgn), HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     }
 
 	printf("%d->%d end@(%d,%d)\n",shiftdeg(), shift, shiftx(shift), shifty(shift));
