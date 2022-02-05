@@ -22,7 +22,8 @@
 /// \tag::uart_advanced[]
 
 #define UART_ID uart0
-#define BAUD_RATE 9600
+#define BAUD_RATE 115200
+#define DEFAULT_BAUD_RATE 9600
 #define DATA_BITS 8
 #define STOP_BITS 1
 #define PARITY    UART_PARITY_NONE
@@ -46,7 +47,7 @@ uint8_t hgps_buff_data[12];
 void on_uart_rx() {
     while (uart_is_readable(UART_ID)) {
         uint8_t ch = uart_getc(UART_ID);
-		//printf("%c",ch);
+	printf("%c",ch);
         chars_rxed++;
         /* Make interrupt handler as fast as possible */
         /* Only write to received buffer and process later */
@@ -75,7 +76,7 @@ void animate() {
     ok = (hgps.is_valid) ? 65 : 86;
 
     //printf("[%c/%f] %02d:%02d:%02d UTC @(%f,%f) z=%fm s=%fKn c=%f%c\n",ok, hgps.dop_h, hgps.hours, hgps.minutes, hgps.seconds, hgps.latitude, hgps.longitude, hgps.altitude, hgps.speed, hgps.course, deg);
-    printf("%02d:%02d\n",hgps.minutes,hgps.seconds);
+    //printf("%02d:%02d\n",hgps.minutes,hgps.seconds);
     char c[3];
 
     int t = hgps.seconds;
@@ -104,7 +105,7 @@ int main() {
     stdio_init_all();
   
     // Set up our UART with a basic baud rate. (TODO - is this step really needed for 9600 baud?)
-    uart_init(UART_ID, 2400);
+    uart_init(UART_ID, DEFAULT_BAUD_RATE);
 
     // Set the TX and RX pins by using the function select on the GPIO
     // Set datasheet for more information on function select
@@ -114,7 +115,7 @@ int main() {
     // Actually, we want a different speed
     // The call will return the actual baud rate selected, which will be as close as
     // possible to that requested
-    int __unused actual = uart_set_baudrate(UART_ID, BAUD_RATE);
+    //int __unused actual = uart_set_baudrate(UART_ID, DEFAULT_BAUD_RATE);
 
     // Set UART flow control CTS/RTS, we don't want these, so turn them off
     uart_set_hw_flow(UART_ID, false, false);
@@ -200,6 +201,14 @@ int main() {
 
   
 
+    // Change baudrate
+    char changebaud[] = "$PQBAUD,W,115200*43\r\n";
+    printf("\nCHANGE BAUD\n");
+    uart_puts(UART_ID, changebaud);
+    
+    int __unused actual = uart_set_baudrate(UART_ID, BAUD_RATE);
+
+    printf("changed baudrate\n");
     
 	while (1) {
 
