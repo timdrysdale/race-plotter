@@ -99,8 +99,21 @@ void animate() {
 
     //Paint_DrawRectangle(65,103,89, 265, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     //Paint_DrawCircle(77,103,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+    // decimal point
     Paint_DrawCircle(270,265,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
+    // shift indicator
+    int shift;
+    shift = (t-30) * 8;
+
+    // draw line
+    Paint_DrawRectangle(240,20-12,240+shift, 20+12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    // draw end
+    Paint_DrawCircle(240+shift,20,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    // central starting point
+    Paint_DrawCircle(240,20,20, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    Paint_DrawCircle(240,20,8, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
  
     EPD_3IN7_1Gray_Display(BlackImage);
     
