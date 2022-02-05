@@ -47,7 +47,7 @@ uint8_t hgps_buff_data[12];
 void on_uart_rx() {
     while (uart_is_readable(UART_ID)) {
         uint8_t ch = uart_getc(UART_ID);
-	printf("%c",ch);
+	//printf("%c",ch);
         chars_rxed++;
         /* Make interrupt handler as fast as possible */
         /* Only write to received buffer and process later */
@@ -160,28 +160,21 @@ int main() {
         return -1;
     }
 
-    //Imagesize = ((200 % 4 == 0)? (200 / 4 ): (200 / 4 + 1)) * 200;
-    if((CharImage = (UBYTE *)malloc(Imagesize)) == NULL) {
-        printf("Failed to apply for char memory...\r\n");
-        return -1;
-    }
+     Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
+     Paint_SelectImage(BlackImage);
+     Paint_SetScale(4);
+     Paint_Clear(WHITE);
+     //Paint_DrawString_EN(200,75, "SPEED-SHIFT", &Font24, WHITE, BLACK);
+     //Paint_DrawString_EN(200,95, "    v0.1", &Font24, WHITE, BLACK);
 
+     EPD_3IN7_4Gray_Display(BlackImage);
+     DEV_Delay_ms(1000);
 
-    Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
-    Paint_SelectImage(BlackImage);
-    Paint_SetScale(4);
-    Paint_Clear(WHITE);
-    //Paint_DrawString_EN(200,75, "SPEED-SHIFT", &Font24, WHITE, BLACK);
-    //Paint_DrawString_EN(200,95, "    v0.1", &Font24, WHITE, BLACK);
+     EPD_3IN7_4Gray_Clear();
+     DEV_Delay_ms(500);
 
-    EPD_3IN7_4Gray_Display(BlackImage);
-    DEV_Delay_ms(1000);
-
-    //EPD_3IN7_4Gray_Clear();
-
-    DEV_Delay_ms(500);
-    EPD_3IN7_1Gray_Init();
-    EPD_3IN7_1Gray_Clear();
+     EPD_3IN7_1Gray_Init();
+     EPD_3IN7_1Gray_Clear();
 
 
 	// lwGPS setup
