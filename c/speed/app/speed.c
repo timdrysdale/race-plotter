@@ -90,13 +90,16 @@ void animate() {
     Paint_SelectImage(BlackImage);
     Paint_SetScale(2);
     Paint_Clear(WHITE);
-
+    
+    if (true) { //first digit is a 1
     Paint_DrawChar(25,90, 33, &Font189, BLACK, WHITE);
+    }
+
     Paint_DrawString_EN(125,90, c, &Font189, WHITE, BLACK);
 
     //Paint_DrawRectangle(65,103,89, 265, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     //Paint_DrawCircle(77,103,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    //Paint_DrawCircle(77,265,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    Paint_DrawCircle(270,265,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
  
     EPD_3IN7_1Gray_Display(BlackImage);
