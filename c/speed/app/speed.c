@@ -17,6 +17,7 @@
 #include "GUI_Paint.h"
 #include "Debug.h"
 #include <stdlib.h> // malloc() free()
+#include <math.h>
 
 
 /// \tag::uart_advanced[]
@@ -71,6 +72,77 @@ const char deg=176; //deg symbol
 UBYTE *BlackImage;
 UBYTE *CharImage;
 
+#define X_OFFSET 240
+#define Y_OFFSET 30
+#define CORNER_X 150
+#define CORNER_RADIUS 60
+#define SIDE_LENGTH 120
+#define HALF_BAR 17
+#define INNER_DOT_RADIUS 12
+#define OUTER_DOT_RADIUS 30
+//#define ARC 47
+// maximum shift bar is equal to this many degrees:
+#define MAX_DEG 48
+
+// maximum shift in pixels we can show
+int maxshift() {
+        int arc = M_PI_2 * CORNER_RADIUS;
+	return CORNER_X + arc + SIDE_LENGTH;
+}
+
+// position of the X-coordinate of middle of the bar for a given shift value in pixels
+int shiftx(int shift){
+
+    if (shift == 0) {
+      return X_OFFSET;
+    }
+
+    int abs_shift = abs(shift);
+    int direction = (shift > 0)? 1 : -1;
+
+    if (shift <= CORNER_X) {
+      return X_OFFSET + (direction * shift);
+    }
+
+    float arc = M_PI_2 * CORNER_RADIUS; //quarter circumference 
+
+    if  (shift <= (CORNER_X + (int)arc)) {
+      float angle = (float) (shift - CORNER_X) / arc * M_PI_2;
+      return X_OFFSET + direction * ( CORNER_X + (int) (CORNER_RADIUS * sinf(angle))); //sinf for float, sin for double
+   }
+
+   // vertical line, does not need arc length in it
+   return X_OFFSET + direction * ( CORNER_X + CORNER_RADIUS);
+
+}
+
+int shifty(int shift) {
+
+    if (shift <= CORNER_X) {
+	return Y_OFFSET;
+    }
+
+    float arc = M_PI_2 * CORNER_RADIUS; //quarter circumference 
+
+    if  (shift <= (CORNER_X + (int)arc)) {
+
+      float angle = (float) (shift - CORNER_X) / arc * M_PI_2;
+
+      return Y_OFFSET + (int) (CORNER_RADIUS * (1-cosf(angle))); //sinf for float, sin for double
+   }
+
+   // vertical line, does not need arc length in it
+   return Y_OFFSET + CORNER_RADIUS + shift - CORNER_X - arc;
+
+}
+
+int pseudoshift;
+
+int shiftdeg() {
+	// just for demo purposes
+  return (++pseudoshift%90)-45;
+}
+
 void animate() {
     char ok;
     ok = (hgps.is_valid) ? 65 : 86;
@@ -80,40 +152,48 @@ void animate() {
     char c[2];
 
     int t = hgps.seconds;
-    sprintf(c,"%02d",t);
-    int i;
-    for (i = 0; i < 2; i ++) {
-        c[i] -=  16;
-    } 
 
     Paint_NewImage(BlackImage, EPD_3IN7_WIDTH, EPD_3IN7_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
     Paint_SetScale(2);
     Paint_Clear(WHITE);
+    Paint_DrawCircle(270,265,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+    // shift indicator
+
+    int shift = shiftdeg() * 480 / MAX_DEG; //intermediate results are int so order matters?
+  
+    int i;
+    for (i=1; i < shift; i++) {
+        Paint_DrawCircle(shiftx(i), shifty(i), HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    }
+
+	printf("%d->%d end@(%d,%d)\n",shiftdeg(), shift, shiftx(shift), shifty(shift));
+    // draw line
+    //Paint_DrawRectangle(X_OFFSET,Y_OFFSET-HALF_BAR, X_OFFSET+shift, Y_OFFSET+HALF_BAR, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    // draw end
+    //Paint_DrawCircle(240+shift,30,17, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    // central starting point
+    Paint_DrawCircle(X_OFFSET,Y_OFFSET,OUTER_DOT_RADIUS, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    Paint_DrawCircle(X_OFFSET,Y_OFFSET,INNER_DOT_RADIUS, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+    // draw speed last so corner construction does not blank it out.
+
+    // decimal point
+    Paint_DrawCircle(270,265,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+    sprintf(c,"%02d",t);
     
-    if (true) { //first digit is a 1
+    for (i = 0; i < 2; i ++) {
+        c[i] -=  16;
+    }
+
+    if (true) { //when have speed, check if first digit is a 1
     Paint_DrawChar(25,90, 33, &Font189, BLACK, WHITE);
     }
 
     Paint_DrawString_EN(125,90, c, &Font189, WHITE, BLACK);
 
-    //Paint_DrawRectangle(65,103,89, 265, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    //Paint_DrawCircle(77,103,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-
-    // decimal point
-    Paint_DrawCircle(270,265,12, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-
-    // shift indicator
-    int shift;
-    shift = (t-30) * 8;
-
-    // draw line
-    Paint_DrawRectangle(240,30-17,240+shift, 30+17, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    // draw end
-    Paint_DrawCircle(240+shift,30,17, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    // central starting point
-    Paint_DrawCircle(240,30,30, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawCircle(240,30,12, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
  
     EPD_3IN7_1Gray_Display(BlackImage);
     
